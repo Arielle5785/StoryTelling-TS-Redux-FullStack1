@@ -19,12 +19,12 @@ app.use('/users', userRoutes);
 app.use('/stories', storyRoutes);
 
 // Serve React build files
-const CLIENT_BUILD_PATH = path.join(__dirname, '/client/build');
-app.use(express.static(CLIENT_BUILD_PATH));
+const REACT_APP_BASE_URL = path.join(__dirname, '/client/build');
+app.use(express.static(REACT_APP_BASE_URL));
 
 // Catch-all handler to serve React app for unhandled GET requests
 app.get('*', (req, res) => {
-  res.sendFile(path.resolve(CLIENT_BUILD_PATH, 'index.html'));
+  res.sendFile(path.resolve(REACT_APP_BASE_URL, 'index.html'));
 });
 
 // Start the server
