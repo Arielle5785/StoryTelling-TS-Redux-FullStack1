@@ -3,7 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../auth/useAuth";
 
-const apiBaseUrl: string = import.meta.env.VITE_API_BASE_URL;
+const apiBaseUrl: string = import.meta.env.VITE_API_BASE_URL||"";
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState<string>("");
