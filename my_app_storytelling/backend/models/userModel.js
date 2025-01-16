@@ -12,7 +12,7 @@ module.exports = {
         {
           username,
           email: email.toLowerCase(),
-          password: hashPassword,
+          password_hash: hashPassword,
         },
         ["id","username","email" ]
       );
@@ -29,7 +29,7 @@ module.exports = {
   getUserByEmail: async (email) => {
     try {
       const user = await db("users")
-        .select("id", "username", "email", "password")
+        .select("id", "username", "email", "password_hash")
         .where({ email: email.toLowerCase() })
         .first();
       return user;
