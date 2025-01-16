@@ -2,6 +2,7 @@ const express = require("express");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const userRouter = require("./routes/userRouter.js");
+const path = require('path')
 
 // const { db } = require("./config/db.js");
 
@@ -21,6 +22,19 @@ app.use(
 );
 
 app.use("/api/user", userRouter);
+
+
+console.log(path.resolve(__dirname, "../dist"));
+
+// Have Node serve the files for our built React app
+// app.use(express.static(path.resolve(__dirname, "./client/build")));
+app.use(express.static(path.resolve(__dirname, "../dist")));
+
+// All other GET requests not handled before will return our React app
+app.get("*", (req, res) => {
+  res.sendFile(path.resolve(__dirname, "../dist", "index.html"));
+});
+
 
 // async function testConnection() {
 //   try {
