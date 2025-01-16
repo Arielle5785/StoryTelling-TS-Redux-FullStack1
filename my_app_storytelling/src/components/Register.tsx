@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 const apiBaseUrl: string = import.meta.env.VITE_API_BASE_URL;
 
 const Register: React.FC = () => {
+  const [username, setUsername] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string>("");
@@ -19,14 +20,14 @@ const Register: React.FC = () => {
       // Register user
       await axios.post(
         `${apiBaseUrl}/api/user/register`,
-        { email, password },
+        { username, email, password },
         { withCredentials: true }
       );
 
       // Log in user automatically
       const loginResponse = await axios.post(
         `${apiBaseUrl}/api/user/login`,
-        { email, password },
+        { username, email, password },
         { withCredentials: true }
       );
 
@@ -43,6 +44,17 @@ const Register: React.FC = () => {
     <div className="auth-form-container">
       <h2>Register</h2>
       <form className="auth-form" onSubmit={handleSubmit}>
+        <div className="form-group">
+          <label htmlFor="username">Username</label>
+          <input
+            id="username"
+            name="username"
+            type="text"
+            required
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+          />
+          </div>
         <div className="form-group">
           <label htmlFor="email">Email</label>
           <input

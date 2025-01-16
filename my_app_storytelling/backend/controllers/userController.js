@@ -5,10 +5,15 @@ require("dotenv").config();
 
 module.exports = {
   registerUser: async (req, res) => {
-    const { password, email } = req.body;
+    const { username, password, email } = req.body;
+    if (!username || !password || !email) {
+      return res.status(400).json({
+        message: "All fields (username, email, password) are required",
+      });
+    }
 
     try {
-      const user = await userModel.createUser(password, email);
+      const user = await userModel.createUser(username, email, password);
       res.status(201).json({
         message: "User registered successfully",
         user,
@@ -63,7 +68,7 @@ module.exports = {
       /** response to client */
       res.status(200).json({
         message: "Login Successfully",
-        user: { userid: user.id, email: user.email },
+        user: { userid: user.id, username: user.username, email: user.email },
         token: accessToken,
       });
     } catch (error) {
