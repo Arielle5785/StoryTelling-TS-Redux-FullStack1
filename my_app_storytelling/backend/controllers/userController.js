@@ -33,7 +33,7 @@ module.exports = {
     }
   },
   loginUser: async (req, res) => {
-    const { password, email } = req.body;
+    const { username, email,password } = req.body;
     // console.log(password,email);
 
     try {

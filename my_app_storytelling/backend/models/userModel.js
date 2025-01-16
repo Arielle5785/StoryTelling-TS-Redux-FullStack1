@@ -2,7 +2,7 @@ const {db} = require('../db/db.js');
 const bcrypt = require("bcrypt");
 
 module.exports = {
-  createUser: async (username, password, email) => {
+  createUser: async (username, email, password ) => {
     const trx = await db.transaction();
     try {
       /** hash password bcrypt / argon2 */
@@ -10,7 +10,7 @@ module.exports = {
 
       const [user] = await trx("users").insert(
         {
-          username,
+          username: username.toLowerCase(),
           email: email.toLowerCase(),
           password_hash: hashPassword,
         },
