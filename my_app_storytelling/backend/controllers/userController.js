@@ -6,6 +6,8 @@ require("dotenv").config();
 module.exports = {
   registerUser: async (req, res) => {
     const { username, password, email } = req.body;
+    console.log(username, password, email);
+    
     if (!username || !password || !email) {
       return res.status(400).json({
         message: "All fields (username, email, password) are required",
@@ -33,18 +35,18 @@ module.exports = {
     }
   },
   loginUser: async (req, res) => {
-    const { username, email,password } = req.body;
-    // console.log(password,email);
+    const { email,password } = req.body;
+    console.log(password,email);
 
     try {
       const user = await userModel.getUserByEmail(email);
-      //   console.log(user);
+        console.log(user);
       if (!user) {
         res.status(404).json({ message: "User not found" });
         return;
       }
 
-      const passwordMatch = await bcrypt.compare(password + "", user.password);
+      const passwordMatch = await bcrypt.compare(password + "", user.password_hash);
       //   console.log(passwordMatch);
 
       if (!passwordMatch) {

@@ -18,21 +18,23 @@ const Register: React.FC = () => {
 
     try {
       // Register user
+      console.log(username, password, email);
+      
       await axios.post(
         `${apiBaseUrl}/api/user/register`,
-        { username, email, password },
+        { username, password, email },
         { withCredentials: true }
       );
 
-      // // Log in user automatically
-      const loginResponse = await axios.post(
-        `${apiBaseUrl}/api/user/login`,
-        { username, email, password },
-        { withCredentials: true }
-      );
+      // // // Log in user automatically
+      // const loginResponse = await axios.post(
+      //   `${apiBaseUrl}/api/user/login`,
+      //   { username, password, email  },
+      //   { withCredentials: true }
+      // );
 
-      const { user, token } = loginResponse.data;
-      console.log({ user, token });
+      // const { user, token } = loginResponse.data;
+      // console.log({ user, token });
 
       navigate("/dashboard");
     } catch (err: any) {
