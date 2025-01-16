@@ -32,7 +32,7 @@ const Register: React.FC = () => {
       // );
 
       // const { user, token } = loginResponse.data;
-      console.log({ user, token });
+      // console.log({ user, token });
 
       navigate("/dashboard");
     } catch (err: any) {
