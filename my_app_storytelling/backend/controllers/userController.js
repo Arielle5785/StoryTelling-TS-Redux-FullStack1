@@ -1,66 +1,113 @@
+const userModel = require("../models/userModel.js");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const User = require("../models/userModel");
-const saltRounds = 10;
+require("dotenv").config();
 
-const register = async (req, res) => {
-  try {
-    const { username, email, password } = req.body;
+module.exports = {
+  registerUser: async (req, res) => {
+    const { password, email } = req.body;
 
-    // Input validation
-    if (!username || !email || !password) {
-      return res.status(400).json({ message: "All fields are required." });
+    try {
+      const user = await userModel.createUser(password, email);
+      res.status(201).json({
+        message: "User registered successfully",
+        user,
+      });
+    } catch (error) {
+      console.log(error);
+      if (error.code === "23505") {
+        res.status(400).json({
+          message: "Email already exists",
+        });
+        return;
+      } else {
+        res.status(500).json({
+          message: "Internal server error",
+        });
+      }
     }
+  },
+  loginUser: async (req, res) => {
+    const { password, email } = req.body;
+    // console.log(password,email);
 
-    // Hash the password
-    const hashedPassword = await bcrypt.hash(password, saltRounds);
+    try {
+      const user = await userModel.getUserByEmail(email);
+      //   console.log(user);
+      if (!user) {
+        res.status(404).json({ message: "User not found" });
+        return;
+      }
 
-    // Save to the database
-    const user = await User.create(username, email, hashedPassword);
+      const passwordMatch = await bcrypt.compare(password + "", user.password);
+      //   console.log(passwordMatch);
 
-    res.status(201).json({ user });
-  } catch (error) {
-    res.status(500).json({ message: "Failed to register user", error });
-  }
-};
-const login = async (req, res) => {
-  try {
-    const { email, password } = req.body;
+      if (!passwordMatch) {
+        res.status(404).json({ message: "Wrong password" });
+        return;
+      }
+      const { JWT_SECRET } = process.env;
+      /** generate a token */
+      const accessToken = jwt.sign(
+        { userid: user.id, email: user.email },
+        JWT_SECRET,
+        { expiresIn: "5m" }
+      );
 
-    // Input validation
-    if (!email || !password) {
-      return res.status(400).json({ message: "All fields are required." });
+      /** set the token in httpOnly cookie */
+      res.cookie("token", accessToken, {
+        maxAge: 60* 5 * 1000,
+        httpOnly: true,
+      });
+
+      /** response to client */
+      res.status(200).json({
+        message: "Login Successfully",
+        user: { userid: user.id, email: user.email },
+        token: accessToken,
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({
+        message: "Internal server error",
+      });
     }
-
-    // Find the user by email
-    const user = await User.findByEmail(email);
-    if (!user) {
-      return res.status(401).json({ message: "Invalid credentials." });
+  },
+  getUsers: async (req, res) => {
+    try {
+      const users = await userModel.getUsers();
+      res.json(users);
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({
+        message: "Internal server error",
+      });
     }
-
-    // Compare passwords
-    const isMatch = await bcrypt.compare(password, user.password_hash);
-    if (!isMatch) {
-      return res.status(401).json({ message: "Invalid credentials." });
-    }
-
-    // Generate JWT tokens
-    const accessToken = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, {
-      expiresIn: "15m",
+  },
+  logoutUser: (req, res) => {
+    res.clearCookie("token");
+    req.cookies.token = null;
+    delete req.cookies.token;
+    /** set nul in db column */
+    res.sendStatus(200);
+  },
+  verifyAuth: (req, res) => {
+    const { userid, email } = req.user;
+    const { JWT_SECRET } = process.env;
+    const newAccessToken = jwt.sign({ userid, email }, JWT_SECRET, {
+      expiresIn: "5m",
     });
-    const refreshToken = jwt.sign({ userId: user.id }, process.env.REFRESH_SECRET, {
-      expiresIn: "7d",
+
+    res.cookie("token", newAccessToken, {
+      httpOnly: true,
+      maxAge: 60 * 5 * 1000,
     });
 
-    // Send refresh token as an HTTP-only cookie
-    res.cookie("refreshToken", refreshToken, { httpOnly: true, secure: true });
-
-    // Send access token in the response
-    res.json({ accessToken });
-  } catch (error) {
-    res.status(500).json({ message: "Failed to log in", error });
-  }
+    res.json({
+      message: "verified",
+      user: { userid, email },
+      token: newAccessToken,
+    });
+    // res.sendStatus(200);
+  },
 };
-
-
-module.exports = { register, login };

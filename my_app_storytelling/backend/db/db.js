@@ -1,19 +1,19 @@
-const { Pool } = require('pg');
-require('dotenv').config();
 
-const pool = new Pool({
-  host: process.env.PGHOST,
-  database: process.env.PGDATABASE,
-  user: process.env.PGUSER,
-  password: process.env.PGPASSWORD,
-  port: process.env.PGPORT,
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
-});
+const knex = require("knex");
+require("dotenv").config();
 
-pool.on('connect', () => {
-  console.log('Connected to the Neon DB');
-});
+const { PGHOST, PGDATABASE, PGUSER, PGPASSWORD, PGPORT } = process.env;
 
 module.exports = {
-  query: (text, params) => pool.query(text, params),
+  db: knex({
+    client: "pg",
+    connection: {
+      host: PGHOST,
+      port: PGPORT,
+      user: PGUSER,
+      database: PGDATABASE,
+      password: PGPASSWORD,
+      ssl: { rejectUnauthorized: false },
+    },
+  }),
 };
