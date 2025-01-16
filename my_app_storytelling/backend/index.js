@@ -1,7 +1,7 @@
 const express = require("express");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
-const userRouter = require("./routes/userRouter.js");
+const {userRouter, storyRouter} = require("./routes/allRouter.js");
 const path = require('path')
 
 // const { db } = require("./config/db.js");
@@ -22,6 +22,7 @@ app.use(
 );
 
 app.use("/api/user", userRouter);
+app.use("/api/stories", storyRouter);
 
 
 console.log(path.resolve(__dirname, "../dist"));
