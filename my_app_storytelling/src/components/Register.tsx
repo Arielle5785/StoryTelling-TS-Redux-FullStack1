@@ -24,14 +24,14 @@ const Register: React.FC = () => {
         { withCredentials: true }
       );
 
-      // Log in user automatically
-      const loginResponse = await axios.post(
-        `${apiBaseUrl}/api/user/login`,
-        { username, email, password },
-        { withCredentials: true }
-      );
+      // // Log in user automatically
+      // const loginResponse = await axios.post(
+      //   `${apiBaseUrl}/api/user/login`,
+      //   { username, email, password },
+      //   { withCredentials: true }
+      // );
 
-      const { user, token } = loginResponse.data;
+      // const { user, token } = loginResponse.data;
       console.log({ user, token });
 
       navigate("/dashboard");
