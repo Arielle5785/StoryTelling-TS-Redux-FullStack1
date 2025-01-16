@@ -2,7 +2,7 @@ import { useState, FormEvent } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-const apiBaseUrl: string = import.meta.env.VITE_API_BASE_URL;
+const apiBaseUrl: string = import.meta.env.VITE_API_BASE_URL||"";
 
 const Register: React.FC = () => {
   const [username, setUsername] = useState<string>("");
